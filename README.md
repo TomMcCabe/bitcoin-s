@@ -2,28 +2,30 @@
 
 Bitcoin-S is an implementation of the Bitcoin protocol in the Scala programming language. 
 
+#####Prerequisites:
 * Scala: http://www.scala-lang.org/
+* SBT: http://www.scala-sbt.org/download.html
 * Bitcoin-Core: https://bitcoin.org/en/download
+* Set PATH for bitcoin: [Set environment variable PATH](https://github.com/TomMcCabe/scalacoin/blob/rpc-interface/README/SettingEnvironmentalVariablePath.md)
 
-#####GETTING STARTED
+
+
+
+#####Getting Started
 
 Import/build the project using your preferred IDE. 
 
-We can start a bitcoin server in a Scala console by first importing the serverInitiation file:
+We can start a bitcoin server in a Scala console by first importing the serverInitiation file,  creating a instance of the ServerInitiation class, and initiating that server:
+```
+scala> import org.scalacoin.protocol.server.ServerInitiation
+import org.scalacoin.protocol.server.ServerInitiation
 
-    import org.scalacoin.protocol.server.ServerInitiation
+scala> val createNewServer = new ServerInitiation
+createNewServer: org.scalacoin.protocol.server.ServerInitiation = org.scalacoin.protocol.server.ServerInitiation@1f9f1c5c
 
-Create a instance of the serverInitiation class: 
-
-    val createNewServer = new ServerInitiation
-  
-Now start the server of your choice:
-
-    createNewServer.initiateServer([Server as a string, network optional])
-
-This will start a bitcoin server on the test network: 
-
-    createNewServer.initiateServer("bitcoind -testnet")
+scala> createNewServer.initiateServer("bitcoind -testnet")
+res0: scala.sys.process.Process = scala.sys.process.ProcessImpl$SimpleProcess@68d03f80
+```
   
 There are 3 predefined methods for bitcoin on the main, test, and regression networks.
   
@@ -39,30 +41,22 @@ For a complete list of RPCs for bitcoin and their descriptions, refer to https:/
 
 Bitcoin-S has a RPC client built in. Bitcoin uses a separate program for RPCs. Starting a server uses 'bitcoind', RPCs use 'bitcoin-cli'. 
 
-In a Scala console, import it:
+In a Scala console, import the file and create a new ScalaRPCClient instance. The `sendCommand` method will take official bitcoin RPCs and return their result. In this example, we create an RPC tool for the bitcoin test network and get the block count.
 
-    import org.scalacoin.protocol.rpc.ScalaRPCClient
+```
+scala> import org.scalacoin.rpc.ScalaRPCClient
+import org.scalacoin.rpc.ScalaRPCClient
 
-Create a new instance:
+scala> val testNet = new ScalaRPCClient("bitcoin-cli","-testnet")
+testNet: org.scalacoin.rpc.ScalaRPCClient = org.scalacoin.rpc.ScalaRPCClient@106ca0dc
 
-    val RPC = new ScalaRPCClient(server[string], network[string][optional])
+scala> testNet.sendCommand("getblockcount")
+res8: String =
+"651604
+"
+```
 
-Example creating a RPC for the bitcoin test network:
-
-    val testNet = new ScalaRPCClient("bitcoin-cli", "-testnet")
-
-Here's the base command to build an RPC. With this, you can send a bitcoin RPC through the Scala console:
-
-    sendCommand([Bitcoin RPC][String])
-
-Getting the blockcount:
-
-    testNet.sendCommand("getblockcount")
-Returns: 
-
-    String ="651500"
-
-We've predefined some RPCS to return parsed JSON values to easily interact with the data objects:
+We've also predefined some RPCS to return parsed JSON values to easily interact with the data objects:
 
     getBlockCount
     getBestBlockHash
@@ -78,30 +72,26 @@ We've predefined some RPCS to return parsed JSON values to easily interact with 
     getRawChangeAddress
     getBalance
 
-To demonstrate since it's a small object, let's get the memory pool info. Returning MemPoolInfo using sendCommand will return the value as a string:
+To demonstrate since it's a small object, let's get the memory pool info. Returning MemPoolInfo using `sendCommand` will return the value as a string. We can also use our `getMemPoolInfo` RPC to return it as JSON values, which we can be used to handle the metadata inside the JSON objects:
 
-    testNet.sendCommand("getmempoolinfo")
-Returns:
+```
+scala> testNet.sendCommand("getmempoolinfo")
+res10: String =
+"{
+    "size" : 2,
+    "bytes" : 475
+}
+"
 
-    String =
-    "{
-    "size" : 19,
-    "bytes" : 5300
-    }
-    "
+scala> testNet.getMemPoolInfo
+res11: org.scalacoin.protocol.blockchain.MemPoolInfo = MemPoolInfoImpl(2,475)
 
-However, using our RPC:
+scala> testNet.getMemPoolInfo.size
+res12: Int = 2
 
-    testNet.getMemPoolInfo
-Returns JSON value:
-
-    org.scalacoin.protocol.blockchain.MemPoolInfo = MemPoolInfoImpl(17,4948)
-Which can be used to handle the metadata:
-
-    testNet.getMempoolInfo.size 
-Returns:
-
-    Int = 19
+scala> testNet.getMemPoolInfo.bytes
+res13: Int = 475
+```
 
 Stop the server with `stop` RPC:
 
