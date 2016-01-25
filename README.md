@@ -1,8 +1,8 @@
-##Bitcoin-S 
+#Bitcoin-S 
 
 Bitcoin-S is an implementation of the Bitcoin protocol in the Scala programming language. 
 
-#####Prerequisites:
+##Prerequisites:
 * Scala: http://www.scala-lang.org/
 * SBT: http://www.scala-sbt.org/download.html
 * Bitcoin-Core: https://bitcoin.org/en/download
@@ -11,11 +11,11 @@ Bitcoin-S is an implementation of the Bitcoin protocol in the Scala programming 
 
 
 
-#####Getting Started
+##Getting Started
 
 Import/build the project using your preferred IDE. 
 
-We can start a bitcoin server in a Scala console by first importing the serverInitiation file,  creating a instance of the ServerInitiation class, and initiating that server:
+We can start a bitcoin server in a Scala console by first importing the serverInitiation file,  creating a instance of the ServerInitiation class, and initiating that server. There are 3 predefined methods for bitcoin on the main, test, and regression networks.
 ```
 scala> import org.scalacoin.protocol.server.ServerInitiation
 import org.scalacoin.protocol.server.ServerInitiation
@@ -25,19 +25,22 @@ createNewServer: org.scalacoin.protocol.server.ServerInitiation = org.scalacoin.
 
 scala> createNewServer.initiateServer("bitcoind -testnet")
 res0: scala.sys.process.Process = scala.sys.process.ProcessImpl$SimpleProcess@68d03f80
-```
-  
-There are 3 predefined methods for bitcoin on the main, test, and regression networks.
-  
-    createNewServer.bitcoinMain
-    createNewServer.bitcoinTestNet
-    createNewServer.bitcoinRegTest
 
-#####RPCs
+scala> createNewServer.bitcoinTestNet
+res1: scala.sys.process.Process = scala.sys.process.ProcessImpl$SimpleProcess@2629eb75
+
+scala> createNewServer.bitcoinRegTest
+res2: scala.sys.process.Process = scala.sys.process.ProcessImpl$SimpleProcess@42163487
+
+scala> createNewServer.bitcoinMain
+res3: scala.sys.process.Process = scala.sys.process.ProcessImpl$SimpleProcess@43b569a
+```
+
+##RPCs
   
 For a complete list of RPCs for bitcoin and their descriptions, refer to https://bitcoin.org/en/developer-reference#remote-procedure-calls-rpcs. 
 
-#####Demonstration
+##Demonstration
 
 Bitcoin-S has a RPC client built in. Bitcoin uses a separate program for RPCs. Starting a server uses 'bitcoind', RPCs use 'bitcoin-cli'. 
 
@@ -51,9 +54,7 @@ scala> val testNet = new ScalaRPCClient("bitcoin-cli","-testnet")
 testNet: org.scalacoin.rpc.ScalaRPCClient = org.scalacoin.rpc.ScalaRPCClient@106ca0dc
 
 scala> testNet.sendCommand("getblockcount")
-res8: String =
-"651604
-"
+res8: String = "651604"
 ```
 
 We've also predefined some RPCS to return parsed JSON values to easily interact with the data objects:
@@ -91,8 +92,7 @@ res12: Int = 2
 
 scala> testNet.getMemPoolInfo.bytes
 res13: Int = 475
+
+scala> testNet.stop
+res14: String = "Bitcoin server stopping"
 ```
-
-Stop the server with `stop` RPC:
-
-    testNet.stop
