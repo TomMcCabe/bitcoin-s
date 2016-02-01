@@ -1,5 +1,6 @@
 #Bitcoin-S 
 
+
 Bitcoin-S is an implementation of the Bitcoin protocol in the Scala programming language. 
 
 ##Prerequisites:
