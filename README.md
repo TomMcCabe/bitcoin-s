@@ -1,85 +1,45 @@
-#Bitcoin-S 
+#Bitcoin-S in Sidechain Elements Alpha
 
-Bitcoin-S is an implementation of the Bitcoin protocol in the Scala programming language. 
+###Bitcoin-S:
+* Bitcoin-S - Bitcoin implementation in Scala: https://github.com/bitcoin-s/bitcoin-s/blob/master/README.md
 
-##Prerequisites:
-* Scala: http://www.scala-lang.org/
-* SBT: http://www.scala-sbt.org/download.html
-* Bitcoin-Core: https://bitcoin.org/en/download
-* If using Windows, set your PATH: https://github.com/bitcoin-s/bitcoin-s/blob/master/README/EnvironmentPaths.md
+###Sidechain Elements Alpha
+* Build and running alpha instructions: https://github.com/ElementsProject/elements/blob/alpha/alpha-README.md
 
+###Using Bitcoin-S
+Once Bitcoin-S and Elements are built, we can use Bitcoin-S to process sidechain RPCs with Elements in Scala.
 
-##Getting Started
+After starting a server and creating an instance with Bitcoin-S in the SBT console (see Bitcoin-S build), we can use `ScalaRPCClient` and the `sendCommand` method to perform RPCs with any sidechain, just as we would with Bitcoin. 
 
-Import/build the project using your preferred IDE. 
-
-We can start a bitcoin server in a Scala console by first importing the serverInitiation file and creating a instance of the ServerInitiation class.
 ```
-scala> import org.scalacoin.protocol.server.ServerInitiation
+cd bitcoin-s
+sbt console
 import org.scalacoin.protocol.server.ServerInitiation
-
-scala> val testNet = new ServerInitiation("bitcoind -testnet")
-testNet: org.scalacoin.protocol.server.ServerInitiation = org.scalacoin.protocol.server.ServerInitiation@13ad926
-
-```
-
-##RPCs
-  
-For a complete list of RPCs for bitcoin and their descriptions, refer to https://bitcoin.org/en/developer-reference#remote-procedure-calls-rpcs. 
-
-##Demonstration
-
-Bitcoin-S has a RPC client built in. Bitcoin uses a separate program for RPCs. Starting a server uses `bitcoind`, RPCs use `bitcoin-cli`. 
-
-In a Scala console, import the file and create a new ScalaRPCClient instance. The `sendCommand` method will take official bitcoin RPCs and return their result. In this example, we create an RPC tool for the bitcoin test network and get the block count.
-
-```
-scala> import org.scalacoin.rpc.ScalaRPCClient
 import org.scalacoin.rpc.ScalaRPCClient
-
-scala> val testNet = new ScalaRPCClient("bitcoin-cli","-testnet")
-testNet: org.scalacoin.rpc.ScalaRPCClient = org.scalacoin.rpc.ScalaRPCClient@106ca0dc
-
-scala> testNet.sendCommand("getblockcount")
-res8: String = "651604"
 ```
 
-We've also predefined some RPCS to return parsed JSON values to easily interact with the data objects:
+```
+scala> val server = new ServerInitiation("alphad -rpcuser=<user> -rpcpassword=<pass> -testnet -rpcconnect=127.0.0.1 -rpcconnectport=18332 -tracksidechain=all -txindex -blindtrust=true -daemon") //see alpha-README in Elements for starting alphad outside of sbt console
+server: org.bitcoins.protocol.server.ServerInitiation = org.bitcoins.protocol.server.ServerInitiation@4a71abb6
 
-    getBlockCount
-    getBestBlockHash
-    getBlockChainInfo
-    getMiningInfo
-    getNetworkInfo
-    getMemPoolInfo
-    getPeerInfo
-    getTxOutSetInfo
-    getWalletInfo
-    getDifficulty
-    getNewAddress
-    getRawChangeAddress
-    getBalance
+scala> Bitcoin server starting  
 
-To demonstrate since it's a small object, let's get the memory pool info. Returning MemPoolInfo using `sendCommand` will return the value as a string. We can also use our `getMemPoolInfo` RPC to return it as JSON values, which we can be used to handle the metadata inside the JSON objects:
+scala> val alpha = new ScalaRPCClient("alpha-cli", "-testnet") //starts the RPC client
+```
+
+The default Bitcoin-S RPCs are built for bitcoin and may not work for your blockchain, especially those RPCs that return detailed data. However, the basics should work: 
 
 ```
-scala> testNet.sendCommand("getmempoolinfo")
-res10: String =
-"{
-    "size" : 2,
-    "bytes" : 475
-}
-"
+scala> alpha.getBlockCount
+res2: Int = 121065
 
-scala> testNet.getMemPoolInfo
-res11: org.scalacoin.protocol.blockchain.MemPoolInfo = MemPoolInfoImpl(2,475)
+scala> alpha.getBalance
+res3: Double = 0.00488335
+```
 
-scala> testNet.getMemPoolInfo.size
-res12: Int = 2
+Bitcoin-S is built to be used for any blockchain. Theoretically with the `sendCommand("pass_argument_as_string")`, we can execute any RPC on any blockchain and get the return value just as you would in a cmd shell. Continuing from the previous example:
 
-scala> testNet.getMemPoolInfo.bytes
-res13: Int = 475
-
-scala> testNet.stop
-res14: String = "Bitcoin server stopping"
+```
+scala> alpha.sendCommand("sendtoaddress 2NEdXaa9cfDH4DxBbZSLymonsexvFZ9ip4d .001")
+res35: String = "160b6f2ab3285492e4b33aaff4232b1b35ea03de2d13a52ef66d424f3a14a87d" //returns txid
 ```
