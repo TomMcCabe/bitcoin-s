@@ -1,15 +1,11 @@
 #Bitcoin-S 
 
-
 Bitcoin-S is an implementation of the Bitcoin protocol in the Scala programming language. 
 
 ##Prerequisites:
 * Scala: http://www.scala-lang.org/
 * SBT: http://www.scala-sbt.org/download.html
 * Bitcoin-Core: https://bitcoin.org/en/download
-* Set PATH for bitcoin: [Set environment variable PATH](https://github.com/TomMcCabe/scalacoin/blob/rpc-interface/README/SettingEnvironmentalVariablePath.md)
-
-
 
 
 ##Getting Started
