@@ -14,8 +14,8 @@ After starting a server and creating an instance with Bitcoin-S in the SBT conso
 ```
 cd bitcoin-s
 sbt console
-import org.scalacoin.protocol.server.ServerInitiation
-import org.scalacoin.rpc.ScalaRPCClient
+import org.bitcoins.protocol.server.ServerInitiation
+import org.bitcoins.rpc.ScalaRPCClient
 ```
 
 ```
